@@ -7,7 +7,7 @@ It is intended to be incorporated into GO programming projects that need to
 use self-balancing binary search trees
 
 This implementation is "intrusive", meaning that the tree node structure
-must be embedded inside the data structure to be indexed in the tree.
+must be embedded inside the data structure to be indexed in the tree
 
 This implementation is non-recursive, so it does not suffer from stack
 overflows
