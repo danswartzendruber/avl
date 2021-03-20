@@ -747,8 +747,8 @@ func AvlTreeLookup(root *AvlNode, key interface{}, cmp CmpFuncKey) interface{} {
 	}
 }
 
-// Insert a node into the tree.  Returns false if not already present,
-// and true if already present
+// Insert a node into the tree.  Returns nil if not already present,
+// and existing node address if already present
 
 func AvlTreeInsert(root **AvlNode, item *AvlNode,
 	owner interface{}, cmp CmpFuncNode) interface{} {

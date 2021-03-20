@@ -16,7 +16,7 @@ type myNode struct {
 	deleted   bool
 }
 
-const maxNodes = 1000
+const maxNodes = 1000000
 const hashLen = 32
 
 var root *AvlNode
@@ -66,10 +66,12 @@ func generateHash() string {
 
 func TestAvlInit(t *testing.T) {
 
+	var i int32
+
 	rand.Seed(time.Now().Unix())
 
-	for i := 0; i < maxNodes; i++ {
-		nodes[i].id = rand.Int31()
+	for i = 0; i < maxNodes; i++ {
+		nodes[i].id = i
 		nodes[i].hash = generateHash()
 	}
 }
