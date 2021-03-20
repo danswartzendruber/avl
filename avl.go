@@ -123,7 +123,7 @@ func avlTreeNodeIsUnlinked(node *AvlNode) bool {
 
 func avlSetParentBalance(node, parent *AvlNode, balance int) {
 	node.parent = parent
-	node.balance = int8(balance)
+	node.balance = int8(balance + 1)
 }
 
 // Set the parent of specified node
@@ -138,7 +138,7 @@ func avlSetParent(node, parent *AvlNode) {
 
 func avlGetBalanceFactor(node *AvlNode) int {
 
-	return int(node.balance)
+	return int(node.balance) - 1
 }
 
 // Adjust the balance factor of the specified node
@@ -482,11 +482,9 @@ func avlTreeRebalanceAfterInsert(root **AvlNode, inserted *AvlNode) {
 
 		// The subtree rooted at node has increased in height by 1
 		if node == parent.left {
-			done = avlHandleSubtreeGrowth(root, node,
-				parent, -1)
+			done = avlHandleSubtreeGrowth(root, node, parent, -1)
 		} else {
-			done = avlHandleSubtreeGrowth(root, node,
-				parent, +1)
+			done = avlHandleSubtreeGrowth(root, node, parent, +1)
 		}
 	}
 }
@@ -711,7 +709,7 @@ func avlTreeNextOrPrevInOrder(node *AvlNode, sign int) *AvlNode {
 
 	if avlGetChild(node, +sign) != nil {
 		for next = avlGetChild(node, +sign); avlGetChild(next, -sign) != nil; {
-			next = avlGetChild(node, -sign)
+			next = avlGetChild(next, -sign)
 		}
 	} else {
 		for next = avlGetParent(node); next != nil && node == avlGetChild(next, +sign); {
@@ -753,7 +751,7 @@ func AvlTreeLookup(root *AvlNode, key interface{}, cmp CmpFuncKey) interface{} {
 // and true if already present
 
 func AvlTreeInsert(root **AvlNode, item *AvlNode,
-	owner interface{}, cmp CmpFuncNode) bool {
+	owner interface{}, cmp CmpFuncNode) interface{} {
 
 	curPtr := root
 	var cur *AvlNode = nil
@@ -767,7 +765,7 @@ func AvlTreeInsert(root **AvlNode, item *AvlNode,
 		} else if res > 0 {
 			curPtr = &cur.right
 		} else {
-			return true
+			return cur.owner
 		}
 	}
 
@@ -779,7 +777,7 @@ func AvlTreeInsert(root **AvlNode, item *AvlNode,
 
 	avlTreeRebalanceAfterInsert(root, item)
 
-	return false
+	return nil
 }
 
 // Removes an item from the specified AVL tree.
@@ -953,7 +951,7 @@ func AvlTreeNextInPostOrder(prev, prevParent *AvlNode) interface{} {
 	}
 }
 
-// Return the parent of a specified node
+// Return the parent of a node
 
 func AvlGetParent(node *AvlNode) interface{} {
 	rp := avlGetParent(node)
@@ -964,7 +962,29 @@ func AvlGetParent(node *AvlNode) interface{} {
 	}
 }
 
-// Return the balance factor of a specified node
+// Return the left child of a node
+
+func AvlLeftChild(node *AvlNode) interface{} {
+	rp := node.left
+	if rp != nil {
+		return rp.owner
+	} else {
+		return nil
+	}
+}
+
+// Return the right child of a node
+
+func AvlRightChild(node *AvlNode) interface{} {
+	rp := node.right
+	if rp != nil {
+		return rp.owner
+	} else {
+		return nil
+	}
+}
+
+// Return the balance factor of a node
 
 func AvlGetBalanceFactor(node *AvlNode) int {
 
