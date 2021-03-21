@@ -1,12 +1,11 @@
 package avl
 
 import (
-	"encoding/base64"
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"github.com/stretchr/testify/assert"
-	"math/rand"
 	"testing"
-	"time"
 )
 
 type myNode struct {
@@ -26,62 +25,59 @@ var myp, mypp *myNode
 
 var nodes [maxNodes]myNode
 
-func cmpNumKey(key interface{}, node interface{}) int {
+func cmpNameKey(key interface{}, node interface{}) int {
 
-	myNum1 := key.(int32)
+	myName1 := key.(string)
 
-	myNum2 := node.(*myNode).id
+	myName2 := node.(*myNode).hash
 
-	if myNum1 < myNum2 {
+	if myName1 < myName2 {
 		return -1
-	} else if myNum1 > myNum2 {
+	} else if myName1 > myName2 {
 		return 1
 	} else {
 		return 0
 	}
 }
 
-func cmpNumNode(node1 interface{}, node2 interface{}) int {
+func cmpNameNode(node1 interface{}, node2 interface{}) int {
 
-	myNum1 := node1.(*myNode).id
+	myName1 := node1.(*myNode).hash
 
-	myNum2 := node2.(*myNode).id
+	myName2 := node2.(*myNode).hash
 
-	if myNum1 < myNum2 {
+	if myName1 < myName2 {
 		return -1
-	} else if myNum1 > myNum2 {
+	} else if myName1 > myName2 {
 		return 1
 	} else {
 		return 0
 	}
 }
 
-func generateHash() string {
+func generateHash(i int32) string {
 
-	hash := make([]byte, hashLen)
-	_, _ = rand.Read(hash)
-	rs := base64.StdEncoding.EncodeToString(hash)
-	return rs
+	hash := md5.Sum([]byte(fmt.Sprintf("%0d", i)))
+	return hex.EncodeToString(hash[:])
 }
 
 func TestAvlInit(t *testing.T) {
 
 	var i int32
 
-	rand.Seed(time.Now().Unix())
-
 	for i = 0; i < maxNodes; i++ {
 		nodes[i].id = i
-		nodes[i].hash = generateHash()
+		nodes[i].hash = generateHash(i)
 	}
 }
 
 func TestAvlTreeInsert(t *testing.T) {
 
 	var it interface{}
+	var i int32
 
-	for i := 0; i < maxNodes; i++ {
-		it = AvlTreeInsert(&root, &nodes[i].avlHeader, &nodes[i], cmpNumNode)
+	for i = 0; i < maxNodes; i++ {
+		it = AvlTreeInsert(&root, &nodes[i].avlHeader, &nodes[i], cmpNameNode)
 		assert.Nil(t, it, "node already in tree!")
 	}
 }
@@ -171,7 +167,7 @@ func TestAvlTreeNextInOrder_2nd(t *testing.T) {
 func TestAvlTreeLookup(t *testing.T) {
 
 	for i := 0; i < maxNodes; i++ {
-		p = AvlTreeLookup(root, nodes[i].id, cmpNumKey)
+		p = AvlTreeLookup(root, nodes[i].hash, cmpNameKey)
 		if p != nil {
 			assert.False(t, nodes[i].deleted,
 				fmt.Sprintf("Node %d is NOT in tree!", i))
