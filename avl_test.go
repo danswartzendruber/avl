@@ -79,6 +79,11 @@ func TestAvlTreeInsert(t *testing.T) {
 	for i = 0; i < maxNodes; i++ {
 		it = AvlTreeInsert(&root, &nodes[i].avlHeader, &nodes[i], cmpNameNode)
 		assert.Nil(t, it, "node already in tree!")
+		if it != nil {
+			// if the insert failed, mark the node as deleted to ensure
+			// we don't try to remove it later
+			nodes[i].deleted = true
+		}
 	}
 }
 
