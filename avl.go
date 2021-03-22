@@ -866,7 +866,12 @@ func AvlTreeRemove(root **AvlNode, node *AvlNode) {
 // least-valued node, or nil if the tree is empty
 
 func AvlTreeFirstInOrder(root *AvlNode) interface{} {
-	return avlTreeFirstOrLastInOrder(root, -1).owner
+	rp := avlTreeFirstOrLastInOrder(root, -1)
+    if rp != nil {
+        return rp.owner
+    } else {
+        return nil
+    }
 }
 
 // Starts an reverse in-order traversal of the tree: returns the
