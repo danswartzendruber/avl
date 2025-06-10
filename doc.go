@@ -14,8 +14,9 @@ use self-balancing binary search trees.
 This implementation is "intrusive", meaning that the tree node structure
 must be embedded inside the data structure to be indexed in the tree.
 This is the style commonly used in kernel data structures.  This is
-actually the more general style of implementation; a void pointer and comparison callback-based
-implementation can (but does not have to be) be built on top of it.
+actually the more general style of implementation; a void pointer and
+comparison callback-based implementation can (but does not have to be)
+be built on top of it.
 
 This implementation is non-recursive, so it does not suffer from stack
 overflows.

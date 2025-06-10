@@ -36,8 +36,8 @@ package avl
 //
 // AvlTreeInsert(root, &myNode.avlHdr, &myNode, cmp)
 //
-// The AVL code will stash the myNode pointer the owner interface field
-// in the AVL node structure.  Any exported AVL functions that return a
+// The AVL code will stash the myNode pointer in the owner interface field
+// of the AVL node structure.  Any exported AVL functions that return a
 // structure to the caller (e.g. AvlTreeLookup), will pull the owner field
 // out of the structure and return that interface. which the caller will
 // then assign to a pointer.  Like so:
@@ -61,20 +61,20 @@ type AvlNode struct {
 	left    *AvlNode
 	right   *AvlNode
 	parent  *AvlNode
-	owner   interface{}
+	owner   any
 	balance int8
 	pad     [3]int8
 }
 
-type CmpFuncKey func(interface{}, interface{}) int
-type CmpFuncNode func(interface{}, interface{}) int
+type CmpFuncKey func(any, any) int
+type CmpFuncNode func(any, any) int
 
 // Internal functions - not visible outside this package
 
 // Returns the left child (sign < 0) or the right child (sign > 0) of the
 // specified AVL tree node
-// Note: for all calls of this, 'sign' is constant at compilation time,
-// so the compiler can remove the conditional
+// Note: for all calls of this routine, 'sign' is constant at compilation
+// time, so the compiler can remove the conditional
 
 func avlGetChild(parent *AvlNode, sign int) *AvlNode {
 	if sign < 0 {
@@ -303,12 +303,12 @@ func avlDoDoubleRotate(root **AvlNode, B, A *AvlNode, sign int) *AvlNode {
 //      +1 if node is the right child of parent
 //
 // This function will adjust parent's balance factor, then do a (single
-// or double) rotation if necessary.  The return value will be %true if
-// the full AVL tree is now adequately balanced, or %false if the subtree
+// or double) rotation if necessary.  The return value will be true if
+// the full AVL tree is now adequately balanced, or false if the subtree
 // rooted at parent is now adequately balanced but has increased in
 // height by 1, so the caller should continue up the tree.
 //
-// Note that if %false is returned, no rotation will have been done.
+// Note that if false is returned, no rotation will have been done.
 // Indeed, a single node insertion cannot require that more than one
 // (single or double) rotation be done.
 //
@@ -506,9 +506,9 @@ func avlTreeRebalanceAfterInsert(root **AvlNode, inserted *AvlNode) {
 //      -1 if the right subtree of parent has decreased in height by 1
 //
 // leftDeletedRet
-//      If the return value is not nil, this will be set to %true if the
+//      If the return value is not nil, this will be set to true if the
 //      left subtree of the returned node has decreased in height by 1,
-//      or %false if the right subtree of the returned node has decreased
+//      or false if the right subtree of the returned node has decreased
 //      in height by 1.
 //
 // This function will adjust parent's balance factor, then do a (single
@@ -725,7 +725,7 @@ func avlTreeNextOrPrevInOrder(node *AvlNode, sign int) *AvlNode {
 
 // Look up a specified key.  nil if not present
 
-func AvlTreeLookup(root *AvlNode, key interface{}, cmp CmpFuncKey) interface{} {
+func AvlTreeLookup(root *AvlNode, key any, cmp CmpFuncKey) any {
 
 	cur := root
 
@@ -751,7 +751,7 @@ func AvlTreeLookup(root *AvlNode, key interface{}, cmp CmpFuncKey) interface{} {
 // and existing node address if already present
 
 func AvlTreeInsert(root **AvlNode, item *AvlNode,
-	owner interface{}, cmp CmpFuncNode) interface{} {
+	owner any, cmp CmpFuncNode) any {
 
 	curPtr := root
 	var cur *AvlNode = nil
@@ -809,9 +809,9 @@ func AvlTreeRemove(root **AvlNode, node *AvlNode) {
 		// parent is now the parent of what was node's in-order
 		// successor.  It cannot be NULL, since node itself was
 		// an ancestor of its in-order successor.
-		// leftDeleted has been set to %true if node's
+		// leftDeleted has been set to true if node's
 		// in-order successor was the left child of parent,
-		// otherwise %false
+		// otherwise false
 
 	} else {
 		var child *AvlNode
@@ -865,19 +865,19 @@ func AvlTreeRemove(root **AvlNode, node *AvlNode) {
 // Starts an in-order traversal of the tree: returns the
 // least-valued node, or nil if the tree is empty
 
-func AvlTreeFirstInOrder(root *AvlNode) interface{} {
+func AvlTreeFirstInOrder(root *AvlNode) any {
 	rp := avlTreeFirstOrLastInOrder(root, -1)
-    if rp != nil {
-        return rp.owner
-    } else {
-        return nil
-    }
+	if rp != nil {
+		return rp.owner
+	} else {
+		return nil
+	}
 }
 
 // Starts an reverse in-order traversal of the tree: returns the
 // greatest-valued node, or nil if the tree is empty
 
-func AvlTreeLastInOrder(root *AvlNode) interface{} {
+func AvlTreeLastInOrder(root *AvlNode) any {
 	rp := avlTreeFirstOrLastInOrder(root, 1)
 	if rp != nil {
 		return rp.owner
@@ -888,7 +888,7 @@ func AvlTreeLastInOrder(root *AvlNode) interface{} {
 
 // Continues an in-order traversal of the tree
 
-func AvlTreeNextInOrder(node *AvlNode) interface{} {
+func AvlTreeNextInOrder(node *AvlNode) any {
 	rp := avlTreeNextOrPrevInOrder(node, 1)
 	if rp != nil {
 		return rp.owner
@@ -899,7 +899,7 @@ func AvlTreeNextInOrder(node *AvlNode) interface{} {
 
 // Continues a reverse in-order traversal of the tree
 
-func AvlTreePrevInOrder(node *AvlNode) interface{} {
+func AvlTreePrevInOrder(node *AvlNode) any {
 	rp := avlTreeNextOrPrevInOrder(node, -1)
 	if rp != nil {
 		return rp.owner
@@ -910,7 +910,7 @@ func AvlTreePrevInOrder(node *AvlNode) interface{} {
 
 // Starts a postorder traversal of the tree
 
-func AvlTreeFirstInPostOrder(root *AvlNode) interface{} {
+func AvlTreeFirstInPostOrder(root *AvlNode) any {
 
 	var first *AvlNode
 
@@ -934,7 +934,7 @@ func AvlTreeFirstInPostOrder(root *AvlNode) interface{} {
 
 // Continues a postorder traversal of the tree
 
-func AvlTreeNextInPostOrder(prev, prevParent *AvlNode) interface{} {
+func AvlTreeNextInPostOrder(prev, prevParent *AvlNode) any {
 
 	next := prevParent
 
@@ -958,7 +958,7 @@ func AvlTreeNextInPostOrder(prev, prevParent *AvlNode) interface{} {
 
 // Return the parent of a node
 
-func AvlGetParent(node *AvlNode) interface{} {
+func AvlGetParent(node *AvlNode) any {
 	rp := avlGetParent(node)
 	if rp != nil {
 		return rp.owner
@@ -969,7 +969,7 @@ func AvlGetParent(node *AvlNode) interface{} {
 
 // Return the left child of a node
 
-func AvlLeftChild(node *AvlNode) interface{} {
+func AvlLeftChild(node *AvlNode) any {
 	rp := node.left
 	if rp != nil {
 		return rp.owner
@@ -980,7 +980,7 @@ func AvlLeftChild(node *AvlNode) interface{} {
 
 // Return the right child of a node
 
-func AvlRightChild(node *AvlNode) interface{} {
+func AvlRightChild(node *AvlNode) any {
 	rp := node.right
 	if rp != nil {
 		return rp.owner
