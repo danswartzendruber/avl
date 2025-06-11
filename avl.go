@@ -842,6 +842,12 @@ func AvlTreeRemove(root **AvlNode, node *AvlNode) {
 		} else {
 			if child != nil {
 				avlSetParent(child, parent)
+			} else if *root != node {
+				//
+				// If no children and not the root, this node is not
+				// in the tree!
+				//
+				panic("Node not in tree!")
 			}
 			*root = child
 			return
