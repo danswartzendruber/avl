@@ -63,7 +63,7 @@ type AvlNode struct {
 	parent  *AvlNode
 	owner   any
 	balance int8
-	pad     [3]int8
+	pad     [3]int8 //nolint:unused
 }
 
 type CmpFuncKey func(any, any) int
@@ -111,11 +111,11 @@ func avlGetParent(node *AvlNode) *AvlNode {
 	return node.parent
 }
 
-func avlTreeNodeSetUnlinked(node *AvlNode) {
+func avlTreeNodeSetUnlinked(node *AvlNode) { //nolint:unused
 	node.parent = node
 }
 
-func avlTreeNodeIsUnlinked(node *AvlNode) bool {
+func avlTreeNodeIsUnlinked(node *AvlNode) bool { //nolint:unused
 	return node.parent == node
 }
 

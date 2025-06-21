@@ -16,7 +16,6 @@ type myNode struct {
 }
 
 const maxNodes = 1000000
-const hashLen = 32
 
 var root *AvlNode
 
