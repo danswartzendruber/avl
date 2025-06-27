@@ -17,14 +17,14 @@ type myNode struct {
 
 const maxNodes = 1000000
 
-var root *AvlNode
+var tree *AvlTree
 
-var p interface{}
+var p any
 var myp, mypp *myNode
 
 var nodes [maxNodes]myNode
 
-func cmpNameKey(key interface{}, node interface{}) int {
+func cmpNameKey(key any, node any) int {
 
 	myName1 := key.(string)
 
@@ -39,7 +39,7 @@ func cmpNameKey(key interface{}, node interface{}) int {
 	}
 }
 
-func cmpNameNode(node1 interface{}, node2 interface{}) int {
+func cmpNameNode(node1 any, node2 any) int {
 
 	myName1 := node1.(*myNode).hash
 
@@ -64,6 +64,8 @@ func TestAvlInit(t *testing.T) {
 
 	var i int32
 
+	tree = NewAvlTree()
+
 	for i = 0; i < maxNodes; i++ {
 		nodes[i].id = i
 		nodes[i].hash = generateHash(i)
@@ -72,11 +74,11 @@ func TestAvlInit(t *testing.T) {
 
 func TestAvlTreeInsert(t *testing.T) {
 
-	var it interface{}
+	var it any
 	var i int32
 
 	for i = 0; i < maxNodes; i++ {
-		it = AvlTreeInsert(&root, &nodes[i].avlHeader, &nodes[i], cmpNameNode)
+		it = tree.AvlTreeInsert(&nodes[i].avlHeader, &nodes[i], cmpNameNode)
 		assert.Nil(t, it, "node already in tree!")
 		if it != nil {
 			// if the insert failed, mark the node as deleted to ensure
@@ -88,7 +90,7 @@ func TestAvlTreeInsert(t *testing.T) {
 
 func TestAvlTreeFirstInOrder_1st(t *testing.T) {
 
-	p = AvlTreeFirstInOrder(root)
+	p = tree.AvlTreeFirstInOrder()
 	if p != nil {
 		myp = p.(*myNode)
 	}
@@ -96,17 +98,20 @@ func TestAvlTreeFirstInOrder_1st(t *testing.T) {
 
 func TestAvlTreeNextInOrder_1st(t *testing.T) {
 
-	for p != nil {
-		p = AvlTreeNextInOrder(&myp.avlHeader)
+	for ap := &myp.avlHeader; p != nil; {
+		p = ap.AvlTreeNextInOrder()
 		if p != nil {
+			curp := myp
 			myp = p.(*myNode)
+			assert.Less(t, curp.hash, myp.hash)
+			ap = &myp.avlHeader
 		}
 	}
 }
 
 func TestAvlTreeLastInOrder(t *testing.T) {
 
-	p = AvlTreeLastInOrder(root)
+	p = tree.AvlTreeLastInOrder()
 	if p != nil {
 		myp = p.(*myNode)
 	}
@@ -114,17 +119,20 @@ func TestAvlTreeLastInOrder(t *testing.T) {
 
 func TestAvlTreePrevInOrder(t *testing.T) {
 
-	for p != nil {
-		p = AvlTreePrevInOrder(&myp.avlHeader)
+	for ap := &myp.avlHeader; p != nil; {
+		p = ap.AvlTreePrevInOrder()
 		if p != nil {
+			curp := myp
 			myp = p.(*myNode)
+			assert.Greater(t, curp.hash, myp.hash)
+			ap = &myp.avlHeader
 		}
 	}
 }
 
 func TestAvlTreeFirstInPostOrder(t *testing.T) {
 
-	p = AvlTreeFirstInPostOrder(root)
+	p = tree.AvlTreeFirstInPostOrder()
 	if p != nil {
 		myp = p.(*myNode)
 	}
@@ -132,12 +140,13 @@ func TestAvlTreeFirstInPostOrder(t *testing.T) {
 
 func TestAvlTreeNextInPostOrder(t *testing.T) {
 
-	for p != nil {
-		p = AvlGetParent(&myp.avlHeader)
+	for ap := &myp.avlHeader; p != nil; {
+		p = ap.AvlGetParent()
 		if p != nil {
 			mypp = p.(*myNode)
-			p = AvlTreeNextInPostOrder(&myp.avlHeader, &mypp.avlHeader)
+			p = ap.AvlTreeNextInPostOrder(&mypp.avlHeader)
 			myp = p.(*myNode)
+			ap = &myp.avlHeader
 		}
 	}
 }
@@ -145,14 +154,14 @@ func TestAvlTreeNextInPostOrder(t *testing.T) {
 func TestAvlTreeRemove(t *testing.T) {
 
 	for i := 0; i < maxNodes; i += 2 {
-		AvlTreeRemove(&root, &nodes[i].avlHeader)
+		tree.AvlTreeRemove(&nodes[i].avlHeader)
 		nodes[i].deleted = true
 	}
 }
 
 func TestAvlTreeFirstInOrder_2nd(t *testing.T) {
 
-	p = AvlTreeFirstInOrder(root)
+	p = tree.AvlTreeFirstInOrder()
 	if p != nil {
 		myp = p.(*myNode)
 	}
@@ -160,10 +169,11 @@ func TestAvlTreeFirstInOrder_2nd(t *testing.T) {
 
 func TestAvlTreeNextInOrder_2nd(t *testing.T) {
 
-	for p != nil {
-		p = AvlTreeNextInOrder(&myp.avlHeader)
+	for ap := &myp.avlHeader; p != nil; {
+		p = ap.AvlTreeNextInOrder()
 		if p != nil {
 			myp = p.(*myNode)
+			ap = &myp.avlHeader
 		}
 	}
 }
@@ -171,7 +181,7 @@ func TestAvlTreeNextInOrder_2nd(t *testing.T) {
 func TestAvlTreeLookup(t *testing.T) {
 
 	for i := 0; i < maxNodes; i++ {
-		p = AvlTreeLookup(root, nodes[i].hash, cmpNameKey)
+		p = tree.AvlTreeLookup(nodes[i].hash, cmpNameKey)
 		if p != nil {
 			assert.False(t, nodes[i].deleted,
 				fmt.Sprintf("Node %d is NOT in tree!", i))

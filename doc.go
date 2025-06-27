@@ -21,25 +21,62 @@ be built on top of it.
 This implementation is non-recursive, so it does not suffer from stack
 overflows.
 
+Structures
+
+   AvlTree - this contains only a pointer (*AvlNode) to the root node,
+   nil if empty.  The sole purpose is because the root node pointer can
+   change when we add or delete nodes, and we can't use a pointer to a
+   pointer as the pointer receiver.
+
+   AvlNode - described in avl.go.
+
 Features
 
 Briefly, the supported operations are:
 
+- New
+
+func NewAvl() *TreeAvlTree
+
 - Insertion
+
+func (tree *AvlTree) AvlTreeInsert(item *AvlNode,
+    owner any, cmp CmpFuncNode) any
+
 - Deletion
+
+func (tree *AvlTree) AvlTreeRemove(node *AvlNode)
+
 - Search
+
+func (tree *AvlTree) AvlTreeLookup(key any, cmp CmpFuncKey) any
+
 - In-order traversal (forwards and backwards)
+
+func (tree *AvlTree) AvlTreeFirstInOrder() any
+func (tree *AvlTree) AvlTreeLastInOrder() any
+func (node *AvlNode) AvlTreeNextInOrder() any
+func (node *AvlNode) AvlTreePrevInOrder() any
+
 - Post-order traversal
 
-See avl_tree.h for details.
+func (tree *AvlTree) AvlTreeFirstInPostOrder() any
+func (prev *AvlNode) AvlTreeNextInPostOrder(prevParent *AvlNode) any
+
+- Miscellaneous
+
+   func (node *AvlNode) AvlGetParent() any {
+   func (node *AvlNode) AvlLeftChild() any {
+   func (node *AvlNode) AvlRightChild() any {
+   func (node *AvlNode) AvlGetBalanceFactor() int {
 
 Files
 
-- avl_tree.go  Interface functions.  We follow the GO convention that
-               "internal" functions begin with lower-case letters, and
-               "exported" functions with upper-case letters
+- avl.go  Interface functions.  We follow the GO convention that
+          "internal" functions begin with lower-case letters, and
+          "exported" functions with upper-case letters
 
-- test.go:     A test program.
+- avl_test.go: GO test code (invoked by 'go test')
 
 License
 
