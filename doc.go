@@ -36,7 +36,7 @@ Briefly, the supported operations are:
 
 - New
 
-func NewAvl() *TreeAvlTree
+func NewAvlTree() *TreeAvlTree
 
 - Insertion
 
