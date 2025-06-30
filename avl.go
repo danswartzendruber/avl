@@ -855,7 +855,8 @@ func (tree *AvlTree) AvlTreeRemove(node *AvlNode) {
 			} else if tree.root != node {
 				//
 				// If no children and not the root, this node is not
-				// in the tree!
+				// return silently.  This makes it convenient for the
+				// call to call AvlTreeRemove "just in case"
 				//
 				panic("Node not in tree!")
 			}
